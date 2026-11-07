@@ -1,0 +1,22 @@
+# Third-party reference harness checkouts (studied during design; not A4L code)
+ref/
+
+# Local notes unrelated to the A4L project
+docs/
+
+# Rust
+target/
+**/*.rs.bk
+
+# Node / TypeScript
+node_modules/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# A4L runtime state (populated by `a4l init` inside target projects)
+.a4l/history/
+.env
