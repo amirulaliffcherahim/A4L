@@ -18,5 +18,5 @@ __pycache__/
 .venv/
 
 # A4L runtime state (populated by `a4l init` inside target projects)
-.a4l/history/
+.a4l/
 .env
