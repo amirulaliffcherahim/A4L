@@ -11,6 +11,7 @@ members = [
     "crates/a4l-pty",
     "crates/a4l-memory",
     "crates/a4l-desktop",
+    "crates/a4l-ext-anthropic",
 ]
 
 [workspace.package]

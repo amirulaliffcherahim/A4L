@@ -35,6 +35,9 @@ enum Commands {
     /// Show current pipeline status and queue
     Status,
 
+    /// Launch interactive terminal dashboard (TUI)
+    Tui,
+
     /// Execute a task or watch the task queue
     Run {
         /// Target task ID (e.g. T-0001)
@@ -128,6 +131,9 @@ async fn main() -> anyhow::Result<()> {
         Some(Commands::Status) => {
             commands::status::run_status(&repo_root);
         }
+        Some(Commands::Tui) => {
+            commands::tui::run_tui(&repo_root)?;
+        }
         Some(Commands::Run {
             task,
             watch,
@@ -194,7 +200,12 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         None => {
-            commands::status::run_status(&repo_root);
+            // If TTY, open interactive TUI; else print status
+            if std::io::IsTerminal::is_terminal(&std::io::stdout()) {
+                let _ = commands::tui::run_tui(&repo_root);
+            } else {
+                commands::status::run_status(&repo_root);
+            }
         }
     }
 

@@ -114,4 +114,43 @@ mod tests {
         // Search memory (empty or no db)
         commands::memory::run_memory_search(dir.path(), "cannot find").unwrap();
     }
+
+    #[test]
+    fn test_tui_render_buffer() {
+        use a4l_core::state::{CircuitBreaker, Gates, Task, TaskRole, TaskState, TaskStatus};
+        use ratatui::backend::TestBackend;
+        use ratatui::Terminal;
+
+        let backend = TestBackend::new(80, 24);
+        let mut terminal = Terminal::new(backend).unwrap();
+
+        let tasks = vec![Task {
+            id: "T-0001".to_string(),
+            title: "TUI Test Task".to_string(),
+            created_at: chrono::Utc::now(),
+            updated_at: chrono::Utc::now(),
+            state: TaskState {
+                status: TaskStatus::InProgress,
+                role: TaskRole::Maker,
+                attempt: 1,
+                context_bundle: None,
+            },
+            todos: vec![],
+            acceptance_criteria: vec![],
+            gates: Gates::default(),
+            errors: vec![],
+            circuit_breaker: CircuitBreaker::default(),
+        }];
+
+        terminal
+            .draw(|f| {
+                commands::tui::render_ui(f, &tasks, 0);
+            })
+            .unwrap();
+
+        let buffer = terminal.backend().buffer();
+        let content: String = buffer.content().iter().map(|c| c.symbol()).collect();
+        assert!(content.contains("A4L"));
+        assert!(content.contains("T-0001"));
+    }
 }

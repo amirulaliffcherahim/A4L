@@ -5,3 +5,4 @@ pub mod memory;
 pub mod run;
 pub mod serve;
 pub mod status;
+pub mod tui;
