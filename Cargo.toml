@@ -10,6 +10,7 @@ members = [
     "crates/a4l-server",
     "crates/a4l-pty",
     "crates/a4l-memory",
+    "crates/a4l-desktop",
 ]
 
 [workspace.package]

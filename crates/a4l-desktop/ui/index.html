@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A4L Desktop Control Center</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #2ea043;
+      --red: #f85149;
+      --yellow: #d29922;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+    nav button {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text);
+      padding: 6px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    nav button.active {
+      background: var(--border);
+      border-color: var(--accent);
+    }
+    main {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .kanban-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      height: 100%;
+    }
+    .column {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .column-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .task-card {
+      background: #21262d;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .task-card:hover {
+      border-color: var(--accent);
+    }
+    .task-id {
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .task-title {
+      font-size: 0.95rem;
+      margin: 4px 0 8px 0;
+    }
+    .badges {
+      display: flex;
+      gap: 6px;
+    }
+    .badge {
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .badge.pass { background: #1f6feb22; color: #58a6ff; border: 1px solid #1f6feb; }
+    .badge.fail { background: #f8514922; color: var(--red); border: 1px solid var(--red); }
+    .badge.unrun { background: #8b949e22; color: var(--text-muted); border: 1px solid var(--border); }
+
+    .inspector-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+    .diff-view {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+      margin: 16px 0;
+    }
+    .action-bar {
+      display: flex;
+      gap: 12px;
+    }
+    button.btn-approve {
+      background: var(--green);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.btn-reject {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid var(--red);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">A4L CONTROL CENTER</div>
+    <nav>
+      <button class="active" onclick="switchTab('board')">Pipeline Board</button>
+      <button onclick="switchTab('hitl')">HITL Proof Station</button>
+      <button onclick="switchTab('studio')">A4L Studio</button>
+    </nav>
+  </header>
+
+  <main id="app">
+    <!-- Pipeline Board Tab -->
+    <div id="tab-board" class="kanban-grid">
+      <div class="column">
+        <div class="column-title">1. Planner</div>
+        <div id="col-planner"></div>
+      </div>
+      <div class="column">
+        <div class="column-title">2. Maker</div>
+        <div id="col-maker"></div>
+      </div>
+      <div class="column">
+        <div class="column-title">3. Checker</div>
+        <div id="col-checker"></div>
+      </div>
+      <div class="column">
+        <div class="column-title">4. Human (HITL)</div>
+        <div id="col-human"></div>
+      </div>
+    </div>
+
+    <!-- HITL Inspector Tab -->
+    <div id="tab-hitl" class="inspector-panel" style="display: none;">
+      <h2>Human-in-the-Loop Diff & Proof Station</h2>
+      <p class="text-muted">Review verification proofs and inspect code diff before final merge sign-off.</p>
+      
+      <div class="badges" id="proof-badges" style="margin: 16px 0;">
+        <span class="badge pass">L1 Static: PASS</span>
+        <span class="badge pass">L2 Unit: PASS</span>
+        <span class="badge pass">L3 Smoke: PASS</span>
+        <span class="badge pass">L4 E2E: PASS</span>
+      </div>
+
+      <div class="diff-view" id="diff-content">No active git diff.</div>
+
+      <div class="action-bar">
+        <button class="btn-approve" onclick="handleApprove()">Approve & Commit</button>
+        <button class="btn-reject" onclick="handleSendBack()">Send Back with Notes</button>
+      </div>
+    </div>
+
+    <!-- Studio Tab -->
+    <div id="tab-studio" class="inspector-panel" style="display: none;">
+      <h2>A4L Studio & Memory Browser</h2>
+      <input type="text" id="memory-search-input" onkeyup="if(event.key==='Enter') searchMemory(this.value)" placeholder="Search episodic memory by symptom or keyword (press Enter)..." style="width: 100%; padding: 8px; background: #0d1117; border: 1px solid var(--border); color: white; border-radius: 4px; margin-bottom: 16px;">
+      <div id="studio-content">
+        <h3>Loaded Skills</h3>
+        <ul id="skills-list">
+          <li>meta-architect.md</li>
+          <li>create-skill.md</li>
+          <li>setup-mcp.md</li>
+          <li>create-extension.md</li>
+        </ul>
+        <div id="memory-results" style="margin-top: 20px;"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const invoke = window.__TAURI__?.core?.invoke || async function(cmd, args) {
+      console.log(`[Mock Invoke] ${cmd}`, args);
+      return {};
+    };
+
+    let selectedTaskId = "T-0001";
+
+    function switchTab(tabId) {
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-board').style.display = tabId === 'board' ? 'grid' : 'none';
+      document.getElementById('tab-hitl').style.display = tabId === 'hitl' ? 'block' : 'none';
+      document.getElementById('tab-studio').style.display = tabId === 'studio' ? 'block' : 'none';
+    }
+
+    async function loadTasks() {
+      try {
+        const tasks = await invoke('get_tasks', { repoRoot: "." });
+        renderKanban(tasks.queue || []);
+      } catch (e) {
+        console.error("Error loading tasks:", e);
+      }
+    }
+
+    function renderKanban(queue) {
+      const cols = {
+        planner: document.getElementById('col-planner'),
+        maker: document.getElementById('col-maker'),
+        checker: document.getElementById('col-checker'),
+        human: document.getElementById('col-human')
+      };
+      Object.values(cols).forEach(c => c.innerHTML = '');
+
+      queue.forEach(t => {
+        const role = t.state?.role || 'planner';
+        const card = document.createElement('div');
+        card.className = 'task-card';
+        card.onclick = () => selectTask(t);
+        card.innerHTML = `<div class="task-id">${t.id}</div><div class="task-title">${t.title}</div><div class="badge pass">${t.state.status}</div>`;
+        if (cols[role]) cols[role].appendChild(card);
+      });
+    }
+
+    async function selectTask(task) {
+      selectedTaskId = task.id;
+      switchTab('hitl');
+      try {
+        const diff = await invoke('get_diff', { repoRoot: ".", taskId: task.id });
+        document.getElementById('diff-content').textContent = diff;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function handleApprove() {
+      if (!selectedTaskId) return;
+      try {
+        await invoke('approve_hitl', { repoRoot: ".", taskId: selectedTaskId });
+        alert(`Task ${selectedTaskId} approved & marked completed!`);
+        loadTasks();
+      } catch (e) {
+        alert("Approval failed: " + e);
+      }
+    }
+
+    async function handleSendBack() {
+      if (!selectedTaskId) return;
+      const notes = prompt("Enter reviewer rejection notes:");
+      if (!notes) return;
+      try {
+        await invoke('send_back_hitl', { repoRoot: ".", taskId: selectedTaskId, notes });
+        alert(`Task ${selectedTaskId} sent back to Planner with notes!`);
+        loadTasks();
+      } catch (e) {
+        alert("Send back failed: " + e);
+      }
+    }
+
+    async function searchMemory(query) {
+      if (!query) return;
+      try {
+        const episodes = await invoke('search_memory', { repoRoot: ".", query });
+        const container = document.getElementById('memory-results');
+        container.innerHTML = `<h4>Found ${episodes.length} Episode(s)</h4>`;
+        episodes.forEach(ep => {
+          container.innerHTML += `<div style="background:#21262d; padding:10px; border-radius:4px; margin-bottom:8px;"><strong>[${ep.task_id}] ${ep.title}</strong><br><span style="color:var(--yellow)">Symptoms: ${ep.symptoms}</span><br><span style="color:var(--green)">Resolution: ${ep.resolution}</span></div>`;
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadTasks);
+  </script>
+</body>
+</html>

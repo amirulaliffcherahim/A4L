@@ -1,0 +1,28 @@
+[package]
+name = "a4l-desktop"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "a4l-desktop"
+path = "src/main.rs"
+
+[dependencies]
+a4l-core = { path = "../a4l-core" }
+a4l-policy = { path = "../a4l-policy" }
+a4l-memory = { path = "../a4l-memory" }
+tauri = { version = "2.0", features = [] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+chrono = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
