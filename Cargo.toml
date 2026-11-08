@@ -4,6 +4,10 @@ members = [
     "crates/a4l-policy",
     "crates/a4l-core",
     "crates/a4l-cli",
+    "crates/a4l-ext-api",
+    "crates/a4l-ext",
+    "crates/a4l-mcp",
+    "crates/a4l-server",
 ]
 
 [workspace.package]

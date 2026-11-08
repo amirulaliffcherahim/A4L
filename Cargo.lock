@@ -7,7 +7,11 @@ name = "a4l-cli"
 version = "0.1.0"
 dependencies = [
  "a4l-core",
+ "a4l-ext",
+ "a4l-ext-api",
+ "a4l-mcp",
  "a4l-policy",
+ "a4l-server",
  "anyhow",
  "chrono",
  "clap",
@@ -45,6 +49,50 @@ dependencies = [
 ]
 
 [[package]]
+name = "a4l-ext"
+version = "0.1.0"
+dependencies = [
+ "a4l-ext-api",
+ "anyhow",
+ "chrono",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "a4l-ext-api"
+version = "0.1.0"
+dependencies = [
+ "a4l-policy",
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "a4l-mcp"
+version = "0.1.0"
+dependencies = [
+ "a4l-policy",
+ "anyhow",
+ "async-trait",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "a4l-policy"
 version = "0.1.0"
 dependencies = [
@@ -55,6 +103,23 @@ dependencies = [
  "serde_yml",
  "tempfile",
  "thiserror",
+ "tracing",
+]
+
+[[package]]
+name = "a4l-server"
+version = "0.1.0"
+dependencies = [
+ "a4l-core",
+ "a4l-ext-api",
+ "a4l-policy",
+ "anyhow",
+ "chrono",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+ "tokio",
  "tracing",
 ]
 

@@ -12,6 +12,10 @@ path = "src/main.rs"
 [dependencies]
 a4l-core = { path = "../a4l-core" }
 a4l-policy = { path = "../a4l-policy" }
+a4l-ext = { path = "../a4l-ext" }
+a4l-ext-api = { path = "../a4l-ext-api" }
+a4l-mcp = { path = "../a4l-mcp" }
+a4l-server = { path = "../a4l-server" }
 clap = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }

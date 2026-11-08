@@ -98,7 +98,23 @@ pub fn run_doctor(repo_root: &Path) {
         );
     }
 
-    // 6. Tasks queue state
+    // 6. MCP Configuration check
+    print!("Checking Model Context Protocol (MCP) servers... ");
+    let mcp_path = a4l_dir.join("mcp.json");
+    if mcp_path.exists() {
+        match a4l_mcp::McpConfigFile::load_from_path(&mcp_path) {
+            Ok(cfg) => println!(
+                "{} ({} servers configured)",
+                "✓ OK".green(),
+                cfg.mcp_servers.len()
+            ),
+            Err(e) => println!("{} ({})", "✗ Invalid mcp.json".red(), e),
+        }
+    } else {
+        println!("{}", "ℹ No .a4l/mcp.json found (optional)".dimmed());
+    }
+
+    // 7. Tasks queue state
     let tasks_path = a4l_dir.join("tasks.json");
     if tasks_path.exists() {
         let store = StateStore::new(&tasks_path);

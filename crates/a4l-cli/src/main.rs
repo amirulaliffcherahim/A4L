@@ -1,7 +1,6 @@
 mod commands;
 
 use clap::{Parser, Subcommand};
-use colored::Colorize;
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -15,6 +14,10 @@ struct Cli {
     /// Target project directory
     #[arg(short, long, global = true)]
     dir: Option<PathBuf>,
+
+    /// Disable custom compiled extensions and run clean base binary
+    #[arg(long, global = true)]
+    no_extensions: bool,
 }
 
 #[derive(Subcommand)]
@@ -51,6 +54,27 @@ enum Commands {
         mock: bool,
     },
 
+    /// Start the headless background daemon API
+    Serve {
+        /// Address to bind (e.g. 127.0.0.1:4040)
+        #[arg(short, long)]
+        bind: Option<String>,
+
+        /// Authentication bearer token
+        #[arg(short, long)]
+        token: Option<String>,
+
+        /// Allow remote channel to approve final merge (disabled by default)
+        #[arg(long)]
+        allow_remote_merge: bool,
+    },
+
+    /// Manage compiled A4L extensions
+    Ext {
+        #[command(subcommand)]
+        sub: ExtSubcommands,
+    },
+
     /// View or manage todos
     Todos {
         #[arg(short, long)]
@@ -59,6 +83,16 @@ enum Commands {
         action: String,
         text: Option<String>,
     },
+}
+
+#[derive(Subcommand)]
+enum ExtSubcommands {
+    /// List installed extensions
+    List,
+    /// Add an extension from path or git url
+    Add { name: String, source: String },
+    /// Remove an installed extension
+    Remove { name: String },
 }
 
 #[tokio::main]
@@ -90,16 +124,29 @@ async fn main() -> anyhow::Result<()> {
                 commands::run::run_task_loop(&repo_root, &task_id, headless, mock).await?;
             } else if let Some(watch_file) = watch {
                 println!(
-                    "{}",
-                    format!(
-                        "Watching {} for task updates (press Ctrl+C to exit)...",
-                        watch_file
-                    )
-                    .cyan()
+                    "Watching {} for task updates (press Ctrl+C to exit)...",
+                    watch_file
                 );
                 tokio::signal::ctrl_c().await?;
             } else {
                 commands::status::run_status(&repo_root);
+            }
+        }
+        Some(Commands::Serve {
+            bind,
+            token,
+            allow_remote_merge,
+        }) => {
+            commands::serve::run_serve(&repo_root, bind, token, allow_remote_merge).await?;
+        }
+        Some(Commands::Ext { sub }) => {
+            let a4l_home = repo_root.join(".a4l");
+            match sub {
+                ExtSubcommands::List => commands::ext::run_ext_list(&a4l_home)?,
+                ExtSubcommands::Add { name, source } => {
+                    commands::ext::run_ext_add(&a4l_home, &name, &source)?
+                }
+                ExtSubcommands::Remove { name } => commands::ext::run_ext_remove(&a4l_home, &name)?,
             }
         }
         Some(Commands::Todos { task, action, text }) => {
@@ -118,12 +165,12 @@ async fn main() -> anyhow::Result<()> {
             };
             match a4l_core::tools::todo::execute(&ctx, args) {
                 Ok(res) => {
-                    println!("{}", res.message.green());
+                    println!("{}", res.message);
                     for it in res.items {
                         println!("  [{}] {} ({})", it.id, it.text, it.status);
                     }
                 }
-                Err(e) => eprintln!("{} {}", "Error:".red(), e),
+                Err(e) => eprintln!("Error: {}", e),
             }
         }
         None => {

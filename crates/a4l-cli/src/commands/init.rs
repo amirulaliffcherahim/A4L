@@ -106,6 +106,21 @@ pub fn run_init(target_dir: &Path, force: bool) -> Result<()> {
         include_str!("../../../../templates/skills/meta-architect.md"),
         force,
     )?;
+    write_template(
+        &a4l_dir.join("skills").join("create-skill.md"),
+        include_str!("../../../../templates/skills/create-skill.md"),
+        force,
+    )?;
+    write_template(
+        &a4l_dir.join("skills").join("setup-mcp.md"),
+        include_str!("../../../../templates/skills/setup-mcp.md"),
+        force,
+    )?;
+    write_template(
+        &a4l_dir.join("skills").join("create-extension.md"),
+        include_str!("../../../../templates/skills/create-extension.md"),
+        force,
+    )?;
 
     println!(
         "{}",

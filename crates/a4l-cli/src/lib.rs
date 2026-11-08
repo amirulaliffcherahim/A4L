@@ -67,5 +67,38 @@ mod tests {
             .join("planner.md")
             .exists());
         assert!(dir.path().join("docs").join("testing.md").exists());
+        assert!(dir
+            .path()
+            .join(".a4l")
+            .join("skills")
+            .join("create-skill.md")
+            .exists());
+        assert!(dir
+            .path()
+            .join(".a4l")
+            .join("skills")
+            .join("setup-mcp.md")
+            .exists());
+        assert!(dir
+            .path()
+            .join(".a4l")
+            .join("skills")
+            .join("create-extension.md")
+            .exists());
+    }
+
+    #[test]
+    fn test_ext_cli_commands() {
+        let dir = tempdir().unwrap();
+        let a4l_home = dir.path().join(".a4l");
+
+        // Add
+        commands::ext::run_ext_add(&a4l_home, "my-tool", "github.com/a4l/my-tool").unwrap();
+
+        // List
+        commands::ext::run_ext_list(&a4l_home).unwrap();
+
+        // Remove
+        commands::ext::run_ext_remove(&a4l_home, "my-tool").unwrap();
     }
 }
