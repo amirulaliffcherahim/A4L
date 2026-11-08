@@ -1,0 +1,40 @@
+name: default-policy
+
+commands:
+  - pattern: "cargo check*"
+    decision: allow
+  - pattern: "cargo test*"
+    decision: allow
+  - pattern: "git status*"
+    decision: allow
+  - pattern: "git diff*"
+    decision: allow
+  - pattern: "rm -rf*"
+    decision: ask
+    reason: "destructive command rm -rf requires human confirmation"
+  - pattern: "git push*"
+    decision: ask
+    reason: "remote push requires human approval"
+
+paths:
+  - glob: ".a4l/policies/**"
+    read: allow
+    write: deny
+    reason: "policies cannot be modified during run"
+  - glob: "docs/**"
+    read: allow
+    write: ask
+  - glob: "src/**"
+    read: allow
+    write: allow
+
+git:
+  - op: "status"
+    decision: allow
+  - op: "diff"
+    decision: allow
+  - op: "commit"
+    decision: ask
+  - op: "push"
+    decision: ask
+    reason: "remote push requires human approval"

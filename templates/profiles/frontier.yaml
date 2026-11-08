@@ -1,0 +1,7 @@
+# Frontier model profile (GPT-4o, Claude Sonnet, etc.)
+instruction_depth: lite
+pipeline_depth: lite
+tail_turns: 2
+note_max_tokens: 250
+tool_output_limit: 3000
+examples: false

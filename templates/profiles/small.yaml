@@ -1,0 +1,7 @@
+# Small/Local model profile (Strict, explicit, lower output limit)
+instruction_depth: strict
+pipeline_depth: strict
+tail_turns: 6
+note_max_tokens: 500
+tool_output_limit: 1200
+examples: true

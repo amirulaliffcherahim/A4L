@@ -1,0 +1,7 @@
+# Standard model profile (Balanced instructions)
+instruction_depth: standard
+pipeline_depth: standard
+tail_turns: 4
+note_max_tokens: 350
+tool_output_limit: 2000
+examples: false

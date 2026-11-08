@@ -1,0 +1,11 @@
+name: test-lock-policy
+
+paths:
+  - glob: "tests/**"
+    read: allow
+    write: deny
+    reason: "tests/** is locked and immutable for Maker"
+  - glob: "test/**"
+    read: allow
+    write: deny
+    reason: "test/** is locked and immutable for Maker"
