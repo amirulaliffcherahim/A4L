@@ -8,6 +8,8 @@ members = [
     "crates/a4l-ext",
     "crates/a4l-mcp",
     "crates/a4l-server",
+    "crates/a4l-pty",
+    "crates/a4l-memory",
 ]
 
 [workspace.package]
@@ -36,3 +38,4 @@ futures = "0.3"
 tempfile = "3.17"
 fs2 = "0.4"
 colored = "2.2"
+rusqlite = { version = "0.31", features = ["bundled"] }

@@ -136,6 +136,22 @@ impl CircuitBreakerController {
         let bundle_json = serde_json::to_string_pretty(&bundle)?;
         std::fs::write(bundle_file, bundle_json)?;
 
+        // Index in episodic memory store
+        let db_path = self.repo_root.join(".a4l").join("memory.db");
+        if let Ok(store) = a4l_memory::EpisodicStore::open(&db_path) {
+            let symptoms = format!(
+                "Trip reason: {:?}, error hashes: {:?}",
+                reason, bundle.error_hashes
+            );
+            let _ = store.insert_episode(
+                "failure_bundle",
+                &task.id,
+                &task.title,
+                &symptoms,
+                "Planner rebase executed",
+            );
+        }
+
         // 5. Update task state
         task.circuit_breaker.status = CircuitBreakerStatus::Tripped;
         task.circuit_breaker.reason = Some(reason);

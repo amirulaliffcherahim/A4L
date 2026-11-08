@@ -1,4 +1,7 @@
+use a4l_pty::RollingBuffer;
 use chrono::Utc;
+use std::fs::File;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use thiserror::Error;
@@ -65,15 +68,25 @@ impl GateRunner {
         let output = cmd.output()?;
         let exit_code = output.status.code().unwrap_or(-1);
 
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        let stderr = String::from_utf8_lossy(&output.stderr);
+        // Feed rolling buffer to protect against stdout explosion
+        let mut rolling_buf = RollingBuffer::new(2048, 2048);
+        rolling_buf.feed(&output.stdout);
+        rolling_buf.feed(&output.stderr);
 
-        let log_content = format!(
-            "--- GATE RUN: {} [{}] ---\nCOMMAND: {}\nEXIT: {}\nTIME: {}\n\n=== STDOUT ===\n{}\n\n=== STDERR ===\n{}\n",
-            tier_name, task_id, trimmed, exit_code, now, stdout, stderr
-        );
-
-        std::fs::write(&log_path, log_content)?;
+        let mut log_file = File::create(&log_path)?;
+        writeln!(
+            log_file,
+            "--- GATE RUN: {} [{}] ---\nCOMMAND: {}\nEXIT: {}\nTIME: {}\nIS_TRUNCATED: {}\nTOTAL_BYTES: {}\n\n=== STDOUT ===\n{}\n\n=== STDERR ===\n{}\n",
+            tier_name,
+            task_id,
+            trimmed,
+            exit_code,
+            now,
+            rolling_buf.is_truncated(),
+            rolling_buf.total_bytes(),
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        )?;
 
         Ok(GateResult {
             cmd: trimmed.to_string(),

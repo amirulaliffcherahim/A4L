@@ -214,6 +214,13 @@ mod tests {
         assert_eq!(task.state.status, TaskStatus::Planned);
         assert_eq!(task.state.attempt, 2);
         assert_eq!(task.circuit_breaker.status, CircuitBreakerStatus::Tripped);
+
+        // Verify failure bundle is indexed in episodic memory store
+        let db_path = dir.path().join(".a4l").join("memory.db");
+        let store = a4l_memory::EpisodicStore::open(&db_path).unwrap();
+        let episodes = store.search_by_symptom("DuplicateError").unwrap();
+        assert_eq!(episodes.len(), 1);
+        assert_eq!(episodes[0].task_id, "T-0001");
     }
 
     #[test]

@@ -48,6 +48,7 @@ mod tests {
         assert!(dir.path().join(".a4l").join("A4L.md").exists());
         assert!(dir.path().join(".a4l").join("init.sh").exists());
         assert!(dir.path().join(".a4l").join("tasks.json").exists());
+        assert!(dir.path().join(".a4l").join("MEMORY.md").exists());
         assert!(dir
             .path()
             .join(".a4l")
@@ -100,5 +101,17 @@ mod tests {
 
         // Remove
         commands::ext::run_ext_remove(&a4l_home, "my-tool").unwrap();
+    }
+
+    #[test]
+    fn test_memory_cli_commands() {
+        let dir = tempdir().unwrap();
+        commands::init::run_init(dir.path(), false).unwrap();
+
+        // Show memory
+        commands::memory::run_memory_show(dir.path()).unwrap();
+
+        // Search memory (empty or no db)
+        commands::memory::run_memory_search(dir.path(), "cannot find").unwrap();
     }
 }

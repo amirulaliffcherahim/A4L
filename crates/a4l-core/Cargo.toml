@@ -7,6 +7,8 @@ license.workspace = true
 
 [dependencies]
 a4l-policy = { path = "../a4l-policy" }
+a4l-pty = { path = "../a4l-pty" }
+a4l-memory = { path = "../a4l-memory" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_yml = { workspace = true }

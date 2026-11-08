@@ -16,6 +16,8 @@ a4l-ext = { path = "../a4l-ext" }
 a4l-ext-api = { path = "../a4l-ext-api" }
 a4l-mcp = { path = "../a4l-mcp" }
 a4l-server = { path = "../a4l-server" }
+a4l-pty = { path = "../a4l-pty" }
+a4l-memory = { path = "../a4l-memory" }
 clap = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }

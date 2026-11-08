@@ -75,6 +75,12 @@ enum Commands {
         sub: ExtSubcommands,
     },
 
+    /// Episodic memory and durable facts
+    Memory {
+        #[command(subcommand)]
+        sub: MemorySubcommands,
+    },
+
     /// View or manage todos
     Todos {
         #[arg(short, long)]
@@ -93,6 +99,14 @@ enum ExtSubcommands {
     Add { name: String, source: String },
     /// Remove an installed extension
     Remove { name: String },
+}
+
+#[derive(Subcommand)]
+enum MemorySubcommands {
+    /// Show bounded MEMORY.md
+    Show,
+    /// Search past failure bundles and episodes by symptom keyword
+    Search { query: String },
 }
 
 #[tokio::main]
@@ -149,6 +163,12 @@ async fn main() -> anyhow::Result<()> {
                 ExtSubcommands::Remove { name } => commands::ext::run_ext_remove(&a4l_home, &name)?,
             }
         }
+        Some(Commands::Memory { sub }) => match sub {
+            MemorySubcommands::Show => commands::memory::run_memory_show(&repo_root)?,
+            MemorySubcommands::Search { query } => {
+                commands::memory::run_memory_search(&repo_root, &query)?
+            }
+        },
         Some(Commands::Todos { task, action, text }) => {
             let policy_engine = a4l_policy::PolicyEngine::new(a4l_policy::Role::Maker);
             let ctx = a4l_core::tools::ToolContext {

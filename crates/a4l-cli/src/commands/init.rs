@@ -46,6 +46,11 @@ pub fn run_init(target_dir: &Path, force: bool) -> Result<()> {
         include_str!("../../../../templates/progress.md"),
         force,
     )?;
+    write_template(
+        &a4l_dir.join("MEMORY.md"),
+        "# A4L Project Long-Term Memory\nKey architectural decisions, invariants, and durable preferences.\n",
+        force,
+    )?;
 
     write_template(
         &docs_dir.join("testing.md"),
