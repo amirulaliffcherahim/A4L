@@ -142,9 +142,10 @@ mod tests {
             circuit_breaker: CircuitBreaker::default(),
         }];
 
+        let state = commands::tui::TuiState::new(std::path::PathBuf::from("."));
         terminal
             .draw(|f| {
-                commands::tui::render_ui(f, &tasks, 0);
+                commands::tui::render_main_ui(f, &state, &tasks);
             })
             .unwrap();
 
